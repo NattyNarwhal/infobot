@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Linq;
-using System.Net.Sockets;
 using System.Collections.Generic;
 using Meebey.SmartIrc4net;
 
@@ -34,7 +32,7 @@ namespace IrcTools {
 				Parse(false, e.Data.MessageArray, e.Data.Nick);
 			}
 			catch (IndexOutOfRangeException ex) {
-			
+				Console.WriteLine("{ERR} Someone drew outside the lines!");
 			}
 		}
 		
@@ -49,7 +47,7 @@ namespace IrcTools {
 				}
 			}
 			catch (IndexOutOfRangeException ex) {
-			
+				Console.WriteLine("{ERR} Someone drew outside the lines!");
 			}
 		}
 		
@@ -66,7 +64,7 @@ namespace IrcTools {
 					Parse(false, param, message[1]);
 					break;
 				case "list-cookies":
-					string s = "There cookies are available: ";
+					string s = "These cookies are available: ";
 					foreach (var x in dict) {
 						s += (x.Key + " ");
 					}
