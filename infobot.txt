@@ -1,0 +1,5 @@
+run-from-git|You can run the software from git to have the latest features and report bugs! See https://smuxi.im/documentation/running-from-git
+platforms|Smuxi can run on Linux, BSD, Mac, and Windows! You can download the latest stable version at https://smuxi.im/download
+what-is|Smuxi is a cross-platform chat client for multiple platforms. See https://smuxi.im/about
+join-bar|At the top-right corner of the Smuxi window, there's a thing called the Quick Join - it's an easy way to join a channel on any network you use!
+server|Smuxi is detachable - you can run Smuxi as a frontend to a Smuxi server controlling the connections, similar to a bouncer or screen+irssi. Just connect to a remote engine running the Smuxi server, no port forwarding needed!
