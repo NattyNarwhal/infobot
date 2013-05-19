@@ -8,7 +8,8 @@ namespace IrcTools {
 	public class InfoBot {
 		public static IrcClient irc = new IrcClient();
 		public static Dictionary<string, string> dict = new Dictionary<string, string>();
-		public static string botTrigger = "!infobot";
+		public static Dictionary<string, string> conf = new Dictionary<string, string>();
+		public static Random rng = new Random();
 		
 		public static void Main(string[]args) {
 			// Init dict
@@ -16,14 +17,26 @@ namespace IrcTools {
 				string[] s = l.Split(new char[]{'|'}, 2);
 				dict.Add(s[0], s[1]);
 			}
+			Console.WriteLine("{DBG} Read cookies file");
+			// Init settings
+			foreach (string l in File.ReadAllLines("infobot.ini")) {
+				string[] s = l.Split(new char[]{'='}, 2);
+				conf.Add(s[0], s[1]);
+			}
+			Console.WriteLine("{DBG} Read config file");
 			// Init IRC
 			irc.OnRawMessage += new IrcEventHandler(OnRawMessage);
 			irc.OnQueryMessage += new IrcEventHandler(OnQueryMessage);
 			irc.OnChannelMessage += new IrcEventHandler(OnChannelMessage);
 			irc.SupportNonRfc = true;
-			irc.Connect(args , 6667);
-			irc.Login("InfoBot", "InfoBox");
-			irc.RfcJoin("#smuxi-devel");
+			irc.Connect(new string[]{conf["server"]} , Convert.ToInt32(conf["port"]));
+			Console.WriteLine("{DBG} Connected to IRC");
+			irc.Login(conf["nick"], conf["real"]);
+			Console.WriteLine("{DBG} Logged in");
+			foreach (string c in conf["channel"].Split(';')) {
+				irc.RfcJoin(c);
+				Console.WriteLine("{DBG} Joining " + c);
+			}
 			irc.Listen();
 		}
 		
@@ -42,7 +55,7 @@ namespace IrcTools {
 		
 		public static void OnChannelMessage(object sender, IrcEventArgs e) {
 			try {
-				if (e.Data.Message.StartsWith(botTrigger)) {
+				if (e.Data.Message.StartsWith(conf["trigger"])) {
 					Parse(true, e.Data.MessageArray.Skip(1).ToArray(), e.Data.Channel);
 				}
 			}
@@ -54,6 +67,14 @@ namespace IrcTools {
 		// functions
 		public static void Parse(bool fromChannel, string[] message, string target) {
 			switch (message[0]) {
+				case "coin":
+				case "flip":
+					irc.SendMessage(SendType.Action, target, "flips a coin: " + FlipCoin());
+					break;
+				case "roll":
+				case "dice":
+					irc.SendMessage(SendType.Action, target, "rolls a die: " + rng.Next(1, 7).ToString());
+					break;
 				case "about":
 					irc.SendMessage(SendType.Message, target, GetCookie(message[1]));
 					break;
@@ -77,6 +98,10 @@ namespace IrcTools {
 		
 		public static string GetCookie(string cookie) {
 			return dict.ContainsKey(cookie) ?  dict[cookie] : "Sorry, there is no item by that name!";
+		}
+		
+		public static string FlipCoin() {
+			return Convert.ToBoolean(rng.Next(2)) ? "heads" : "tails";
 		}
 	}
 }
